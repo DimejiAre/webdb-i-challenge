@@ -31,6 +31,28 @@ router.get('/:id', [validateId], (req,res) => {
     res.json(req.account)
 })
 
+router.put('/:id', [validateId, validateBody], async (req,res) => {
+    const id = req.params.id;
+    try{
+        let result = await db('accounts').where({id: id}).update({name: req.body.name, budget: req.body.budget})
+        res.status(200).json({message: ` ${result} row has successfully been updated`})
+    }
+    catch(error){
+        res.status(500).json({error: `An error occured during update ${error}`})
+    }
+})
+
+router.delete('/:id', [validateId], async (req,res) => {
+    const id = req.params.id;
+    try{
+        let result = await db('accounts').where({id: id}).del()
+        res.status(200).json({message: `${result} row has successfully been deleted`})
+    }
+    catch(error){
+        res.status(500).json({error: `An error occured during delete ${error}`})
+    }
+})
+
 
 function validateId(req,res,next){
     const id = req.params.id;
