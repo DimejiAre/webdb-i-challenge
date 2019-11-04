@@ -18,13 +18,28 @@ router.post('/', [validateBody], async (req,res) => {
 })
 
 router.get('/', (req,res) => {
-    db('accounts')
+    if(Object.keys(req.body).length > 0){
+        if(req.body.limit && req.body.sortby && req.body.sortdir){
+            db('accounts').orderBy(req.body.sortby, req.body.sortdir).limit(req.body.limit)
+                .then(response => {
+                    res.status(200).json(response)
+                })
+                .catch(err => {
+                    res.status(500).json({error: 'An error occured retrieving accounts ' + err})
+                })
+        } else {
+            res.status(400).json({message: 'Missing values for limit, sortdir and sortby'})
+        }
+    }
+    else {
+        db('accounts')
         .then(response => {
             res.status(200).json(response)
         })
         .catch(err => {
             res.status(500).json({error: 'An error occured retrieving accounts ' + err})
         })
+    }
 })
 
 router.get('/:id', [validateId], (req,res) => {
